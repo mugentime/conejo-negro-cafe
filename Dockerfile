@@ -1,6 +1,10 @@
 # Use official PHP with Apache
 FROM php:8.2-apache
 
+# Fix MPM configuration - ensure only one MPM is enabled
+RUN a2dismod mpm_event mpm_worker || true \
+    && a2enmod mpm_prefork
+
 # Enable Apache mod_rewrite for clean URLs
 RUN a2enmod rewrite
 
