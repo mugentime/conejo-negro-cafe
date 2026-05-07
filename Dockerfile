@@ -1,11 +1,6 @@
 # Use official PHP with Apache
 FROM php:8.2-apache
 
-# Fix MPM configuration - remove all MPM modules then enable only prefork
-RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
-          /etc/apache2/mods-enabled/mpm_*.conf \
-    && a2enmod mpm_prefork
-
 # Enable Apache mod_rewrite for clean URLs
 RUN a2enmod rewrite
 
@@ -27,5 +22,7 @@ RUN echo '<Directory /var/www/html>\n\
 # Expose port 80
 EXPOSE 80
 
-# Start Apache in foreground
-CMD ["apache2-foreground"]
+# Entrypoint clears conflicting MPM modules at runtime before Apache starts
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+CMD ["docker-entrypoint.sh"]
